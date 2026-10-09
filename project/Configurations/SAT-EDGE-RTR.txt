@@ -1,0 +1,226 @@
+version 15.1
+service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname SAT-EDGE-RTR
+!
+!
+!
+enable secret 5 <REDACTED>
+!
+!
+ip dhcp excluded-address 10.20.20.1 10.20.20.19
+ip dhcp excluded-address 10.20.35.1 10.20.35.19
+ip dhcp excluded-address 10.20.40.1 10.20.40.19
+ip dhcp excluded-address 10.20.70.1 10.20.70.19
+ip dhcp excluded-address 10.20.80.1 10.20.80.19
+ip dhcp excluded-address 10.20.90.1 10.20.90.19
+ip dhcp excluded-address 10.20.100.1 10.20.100.19
+!
+ip dhcp pool SAT-STAFF
+ network 10.20.20.0 255.255.255.0
+ default-router 10.20.20.1
+ dns-server 10.10.6.200
+ip dhcp pool SAT-PRINTERS
+ network 10.20.35.0 255.255.255.0
+ default-router 10.20.35.1
+ dns-server 10.10.6.200
+ip dhcp pool SAT-STUDENTS
+ network 10.20.40.0 255.255.255.0
+ default-router 10.20.40.1
+ dns-server 10.10.6.200
+ip dhcp pool SAT-VOICE
+ network 10.20.70.0 255.255.255.0
+ default-router 10.20.70.1
+ option 150 ip 10.20.70.2
+ip dhcp pool SAT-IOT
+ network 10.20.80.0 255.255.255.0
+ default-router 10.20.80.1
+ dns-server 10.10.6.200
+ip dhcp pool SAT-STAFF-WIFI
+ network 10.20.90.0 255.255.255.0
+ default-router 10.20.90.1
+ dns-server 10.10.6.200
+ip dhcp pool SAT-STUDENT-WIFI
+ network 10.20.100.0 255.255.255.0
+ default-router 10.20.100.1
+ dns-server 10.10.6.200
+!
+!
+!
+ip cef
+no ipv6 cef
+!
+!
+!
+username ictadmin privilege 15 secret 5 <REDACTED>
+!
+!
+license udi pid CISCO2811/K9 sn FTX1017Z16B-
+!
+!
+!
+crypto isakmp policy 10
+ encr aes
+ authentication pre-share
+ group 5
+!
+crypto isakmp key <REDACTED> address 203.0.113.1
+!
+!
+!
+crypto ipsec transform-set UL-TRANSFORM esp-aes esp-sha-hmac
+!
+crypto map UL-VPN 10 ipsec-isakmp 
+ set peer 203.0.113.1
+ set transform-set UL-TRANSFORM 
+ match address VPN-TRAFFIC
+!
+!
+!
+!
+!
+!
+ip ssh version 2
+no ip domain-lookup
+ip domain-name ul.local
+!
+!
+spanning-tree mode pvst
+!
+class-map type inspect match-all SAT-INSIDE-CLASS
+ match access-group name SAT-INSIDE-TRAFFIC
+class-map type inspect match-all MAIN-VPN-CLASS
+ match access-group name MAIN-VPN-IN
+class-map match-any SAT-VOICE-CLASS
+ match access-group name SAT-VOICE-QOS
+ match ip dscp ef
+!
+policy-map type inspect SAT-TO-OUTSIDE-POLICY
+ class type inspect SAT-INSIDE-CLASS
+  inspect
+ class type inspect class-default
+  drop
+!
+policy-map type inspect OUTSIDE-TO-SAT-POLICY
+ class type inspect MAIN-VPN-CLASS
+  pass
+ class type inspect class-default
+  drop
+!
+policy-map SAT-WAN-QOS
+ class SAT-VOICE-CLASS
+  priority percent 20
+ class class-default
+  fair-queue
+!
+policy-map SAT-VOICE-MARK
+ class SAT-VOICE-CLASS
+!
+!
+!
+zone security INSIDE
+zone security OUTSIDE
+zone-pair security SAT-TO-OUTSIDE source INSIDE destination OUTSIDE
+ service-policy type inspect SAT-TO-OUTSIDE-POLICY
+zone-pair security OUTSIDE-TO-SAT source OUTSIDE destination INSIDE
+ service-policy type inspect OUTSIDE-TO-SAT-POLICY
+!
+!
+interface FastEthernet0/0
+ description INSIDE-LINK-TO-SAT-CORE-SW
+ ip address 10.20.255.2 255.255.255.252
+ zone-member security INSIDE
+ service-policy input SAT-VOICE-MARK
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/1
+ description OUTSIDE-LINK-TO-ISP
+ ip address 198.51.100.2 255.255.255.252
+ zone-member security OUTSIDE
+ service-policy output SAT-WAN-QOS
+ duplex auto
+ speed auto
+ crypto map UL-VPN
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+ip classless
+ip route 0.0.0.0 0.0.0.0 198.51.100.1 
+ip route 10.20.0.0 255.255.0.0 10.20.255.1 
+!
+ip flow-export version 9
+!
+!
+ip access-list extended VPN-TRAFFIC
+ permit ip 10.20.0.0 0.0.255.255 10.10.0.0 0.0.255.255
+ip access-list extended SAT-INSIDE-TRAFFIC
+ permit ip 10.20.0.0 0.0.255.255 any
+ip access-list extended MAIN-VPN-IN
+ permit ip 10.10.0.0 0.0.255.255 10.20.0.0 0.0.255.255
+ip access-list extended SAT-STUDENT-POLICY
+ remark ALLOW-MAIN-DNS-UDP
+ permit udp any host 10.10.6.200 eq domain
+ remark ALLOW-MAIN-DNS-TCP
+ permit tcp any host 10.10.6.200 eq domain
+ remark ALLOW-SAT-PRINTER
+ permit ip any 10.20.35.0 0.0.0.255
+ remark BLOCK-SAT-STAFF
+ deny ip any 10.20.20.0 0.0.0.255
+ remark BLOCK-SAT-VOICE
+ deny ip any 10.20.70.0 0.0.0.255
+ remark BLOCK-SAT-IOT
+ deny ip any 10.20.80.0 0.0.0.255
+ remark BLOCK-SAT-STAFF-WIFI
+ deny ip any 10.20.90.0 0.0.0.255
+ remark BLOCK-SAT-MANAGEMENT
+ deny ip any 10.20.110.0 0.0.0.255
+ remark BLOCK-MAIN-CAMPUS
+ deny ip any 10.10.0.0 0.0.255.255
+ remark ALLOW-OTHER-TRAFFIC
+ permit ip any any
+ip access-list extended SAT-IOT-POLICY
+ remark ALLOW-MAIN-IOT-SERVER
+ permit ip any host 10.10.6.202
+ remark BLOCK-OTHER-MAIN-RESOURCES
+ deny ip any 10.10.0.0 0.0.255.255
+ remark BLOCK-SAT-STAFF
+ deny ip any 10.20.20.0 0.0.0.255
+ remark BLOCK-SAT-STUDENTS
+ deny ip any 10.20.40.0 0.0.0.255
+ remark BLOCK-SAT-VOICE
+ deny ip any 10.20.70.0 0.0.0.255
+ remark BLOCK-SAT-STAFF-WIFI
+ deny ip any 10.20.90.0 0.0.0.255
+ remark BLOCK-SAT-MANAGEMENT
+ deny ip any 10.20.110.0 0.0.0.255
+ remark ALLOW-OTHER-TRAFFIC
+ permit ip any any
+ip access-list extended SAT-VOICE-QOS
+ permit ip 10.20.70.0 0.0.0.255 any
+ip access-list standard ICT-MANAGEMENT-ONLY
+ permit 10.10.12.0 0.0.0.31
+ deny any
+!
+!
+!
+!
+!
+logging 10.10.6.203
+line con 0
+!
+line aux 0
+!
+line vty 0 4
+ access-class ICT-MANAGEMENT-ONLY in
+ login local
+ transport input ssh
+!
+!
+ntp server 10.10.6.203
+!
+end

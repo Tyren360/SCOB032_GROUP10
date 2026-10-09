@@ -1,0 +1,164 @@
+version 15.0
+service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname MATH-LAB3-SW
+!
+enable secret 5 $1$mERr$D8mfJuBDqSS8Ta5b5FUFi1
+!
+!
+!
+!
+!
+aaa new-model
+!
+aaa authentication dot1x default group radius 
+aaa authentication login SSH-LOCAL local 
+!
+!
+!
+!
+ip ssh version 2
+ip domain-name ul.local
+!
+username ictadmin secret 5 $1$mERr$eW5zsnm/DYW7MO2IPedta/
+!
+!
+!
+dot1x system-auth-control
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+interface FastEthernet0/1
+ description RESEARCH-LAB-COMPUTERS
+ switchport access vlan 30
+ switchport mode access
+ authentication port-control auto
+ dot1x pae authenticator
+ spanning-tree portfast
+!
+interface FastEthernet0/2
+ description RESEARCH-LAB-COMPUTERS
+ switchport access vlan 30
+ switchport mode access
+ authentication port-control auto
+ dot1x pae authenticator
+ spanning-tree portfast
+!
+interface FastEthernet0/3
+ description LAB3-PRINTER
+ switchport access vlan 35
+ switchport mode access
+ switchport port-security
+ switchport port-security mac-address sticky 
+ switchport port-security violation restrict 
+ switchport port-security mac-address sticky 0060.4713.2A53
+ spanning-tree portfast
+!
+interface FastEthernet0/4
+ shutdown
+!
+interface FastEthernet0/5
+ shutdown
+!
+interface FastEthernet0/6
+ shutdown
+!
+interface FastEthernet0/7
+ shutdown
+!
+interface FastEthernet0/8
+ shutdown
+!
+interface FastEthernet0/9
+ shutdown
+!
+interface FastEthernet0/10
+ shutdown
+!
+interface FastEthernet0/11
+ shutdown
+!
+interface FastEthernet0/12
+ shutdown
+!
+interface FastEthernet0/13
+ shutdown
+!
+interface FastEthernet0/14
+ shutdown
+!
+interface FastEthernet0/15
+ shutdown
+!
+interface FastEthernet0/16
+ shutdown
+!
+interface FastEthernet0/17
+ shutdown
+!
+interface FastEthernet0/18
+ shutdown
+!
+interface FastEthernet0/19
+ shutdown
+!
+interface FastEthernet0/20
+ shutdown
+!
+interface FastEthernet0/21
+ shutdown
+!
+interface FastEthernet0/22
+ shutdown
+!
+interface FastEthernet0/23
+ shutdown
+!
+interface FastEthernet0/24
+ shutdown
+!
+interface GigabitEthernet0/1
+ description REDUNDANT-CORE-UPLINKS
+ switchport trunk allowed vlan 30,35,110
+ switchport mode trunk
+!
+interface GigabitEthernet0/2
+ description REDUNDANT-CORE-UPLINKS
+ switchport trunk allowed vlan 30,35,110
+ switchport mode trunk
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan110
+ ip address 10.10.6.147 255.255.255.192
+!
+ip default-gateway 10.10.6.129
+!
+logging 10.10.6.203
+radius-server host 10.10.6.201 auth-port 1645 key ULRadius@2026
+!
+!
+!
+ip access-list standard ICT-MANAGEMENT-ONLY
+ permit 10.10.12.0 0.0.0.31
+ deny any
+line con 0
+!
+line vty 0 4
+ access-class ICT-MANAGEMENT-ONLY in
+ login authentication SSH-LOCAL
+ transport input ssh
+line vty 5 15
+ access-class ICT-MANAGEMENT-ONLY in
+ login authentication SSH-LOCAL
+ transport input ssh
+!
+!
+!
+ntp server 10.10.6.203
+!
+end

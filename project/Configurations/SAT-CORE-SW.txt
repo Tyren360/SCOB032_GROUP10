@@ -1,0 +1,232 @@
+version 12.2(37)SE1
+service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname SAT-CORE-SW
+!
+!
+no profinet
+enable secret 5 <REDACTED>
+!
+!
+!
+!
+!
+ip routing
+!
+!
+!
+!
+username ictadmin privilege 15 secret 5 <REDACTED>
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip ssh version 2
+no ip domain-lookup
+ip domain-name ul.local
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface FastEthernet0/1
+ description LINK-TO-SAT-VOICE-RTR
+ switchport access vlan 70
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/2
+!
+interface FastEthernet0/3
+!
+interface FastEthernet0/4
+!
+interface FastEthernet0/5
+!
+interface FastEthernet0/6
+!
+interface FastEthernet0/7
+!
+interface FastEthernet0/8
+!
+interface FastEthernet0/9
+!
+interface FastEthernet0/10
+!
+interface FastEthernet0/11
+!
+interface FastEthernet0/12
+!
+interface FastEthernet0/13
+!
+interface FastEthernet0/14
+!
+interface FastEthernet0/15
+!
+interface FastEthernet0/16
+!
+interface FastEthernet0/17
+!
+interface FastEthernet0/18
+!
+interface FastEthernet0/19
+!
+interface FastEthernet0/20
+!
+interface FastEthernet0/21
+!
+interface FastEthernet0/22
+!
+interface FastEthernet0/23
+!
+interface FastEthernet0/24
+!
+interface GigabitEthernet0/1
+ description TRUNK-TO-SAT-SW1
+ switchport trunk allowed vlan 20,35,40,70,80,90,100,110
+!
+interface GigabitEthernet0/2
+ description ROUTED-LINK-TO-SAT-EDGE-RTR
+ no switchport
+ ip address 10.20.255.1 255.255.255.252
+ duplex auto
+ speed auto
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan20
+ description SAT-STAFF-GATEWAY
+ mac-address 0002.17d8.0901
+ ip address 10.20.20.1 255.255.255.0
+ ip helper-address 10.20.255.2
+!
+interface Vlan35
+ description SAT-PRINTER-GATEWAY
+ mac-address 0002.17d8.0902
+ ip address 10.20.35.1 255.255.255.0
+ ip helper-address 10.20.255.2
+!
+interface Vlan40
+ description SAT-STUDENT-GATEWAY
+ mac-address 0002.17d8.0903
+ ip address 10.20.40.1 255.255.255.0
+ ip helper-address 10.20.255.2
+ ip access-group SAT-STUDENT-POLICY in
+!
+interface Vlan70
+ description SAT-VOICE-GATEWAY
+ mac-address 0002.17d8.0904
+ ip address 10.20.70.1 255.255.255.0
+ ip helper-address 10.20.255.2
+!
+interface Vlan80
+ description SAT-IOT-GATEWAY
+ mac-address 0002.17d8.0905
+ ip address 10.20.80.1 255.255.255.0
+ ip helper-address 10.20.255.2
+ ip access-group SAT-IOT-POLICY in
+!
+interface Vlan90
+ description SAT-STAFF-WIFI-GATEWAY
+ mac-address 0002.17d8.0906
+ ip address 10.20.90.1 255.255.255.0
+ ip helper-address 10.20.255.2
+!
+interface Vlan100
+ description SAT-STUDENT-WIFI-GATEWAY
+ mac-address 0002.17d8.0907
+ ip address 10.20.100.1 255.255.255.0
+ ip helper-address 10.20.255.2
+ ip access-group SAT-STUDENT-POLICY in
+!
+interface Vlan110
+ description SAT-MANAGEMENT-GATEWAY
+ mac-address 0002.17d8.0908
+ ip address 10.20.110.1 255.255.255.0
+!
+ip classless
+ip route 0.0.0.0 0.0.0.0 10.20.255.2 
+!
+ip flow-export version 9
+!
+!
+ip access-list extended SAT-STUDENT-POLICY
+ remark ALLOW-MAIN-DNS-UDP
+ permit udp any host 10.10.6.200 eq domain
+ remark ALLOW-MAIN-DNS-TCP
+ permit tcp any host 10.10.6.200 eq domain
+ remark ALLOW-SAT-PRINTERS
+ permit ip any 10.20.35.0 0.0.0.255
+ remark BLOCK-SAT-STAFF
+ deny ip any 10.20.20.0 0.0.0.255
+ remark BLOCK-SAT-VOICE
+ deny ip any 10.20.70.0 0.0.0.255
+ remark BLOCK-SAT-IOT
+ deny ip any 10.20.80.0 0.0.0.255
+ remark BLOCK-SAT-STAFF-WIFI
+ deny ip any 10.20.90.0 0.0.0.255
+ remark BLOCK-SAT-MANAGEMENT
+ deny ip any 10.20.110.0 0.0.0.255
+ remark BLOCK-MAIN-CAMPUS
+ deny ip any 10.10.0.0 0.0.255.255
+ remark ALLOW-OTHER-TRAFFIC
+ permit ip any any
+ip access-list extended SAT-IOT-POLICY
+ remark ALLOW-MAIN-IOT-SERVER
+ permit ip any host 10.10.6.202
+ remark BLOCK-OTHER-MAIN-RESOURCES
+ deny ip any 10.10.0.0 0.0.255.255
+ remark BLOCK-SAT-STAFF
+ deny ip any 10.20.20.0 0.0.0.255
+ remark BLOCK-SAT-STUDENTS
+ deny ip any 10.20.40.0 0.0.0.255
+ remark BLOCK-SAT-VOICE
+ deny ip any 10.20.70.0 0.0.0.255
+ remark BLOCK-SAT-STAFF-WIFI
+ deny ip any 10.20.90.0 0.0.0.255
+ remark BLOCK-SAT-MANAGEMENT
+ deny ip any 10.20.110.0 0.0.0.255
+ remark ALLOW-OTHER-TRAFFIC
+ permit ip any any
+ip access-list standard ICT-MANAGEMENT-ONLY
+ permit 10.10.12.0 0.0.0.31
+ deny any
+!
+!
+!
+!
+!
+!
+logging 10.10.6.203
+line con 0
+!
+line aux 0
+!
+line vty 0 4
+ access-class ICT-MANAGEMENT-ONLY in
+ login local
+ transport input ssh
+line vty 5 15
+ access-class ICT-MANAGEMENT-ONLY in
+ login local
+ transport input ssh
+!
+!
+!
+ntp server 10.10.6.203
+!
+end

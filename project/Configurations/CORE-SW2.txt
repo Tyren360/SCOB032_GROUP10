@@ -1,0 +1,372 @@
+version 12.2(37)SE1
+service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname CORE-SW2
+!
+!
+no profinet
+enable secret 5 <REDACTED>
+!
+!
+!
+!
+!
+ip routing
+!
+!
+!
+!
+username ictadmin privilege 15 secret 5 <REDACTED>
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree vlan 50,90,100 priority 28672
+!
+!
+!
+!
+!
+!
+interface FastEthernet0/1
+!
+interface FastEthernet0/2
+!
+interface FastEthernet0/3
+!
+interface FastEthernet0/4
+!
+interface FastEthernet0/5
+ description TRUNK-TO-MAIN-SERVER-SW
+ switchport trunk allowed vlan 50,60,90,100,110,120
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface FastEthernet0/6
+ switchport trunk allowed vlan 30,35,110
+!
+interface FastEthernet0/7
+ switchport trunk allowed vlan 30,35,110
+!
+interface FastEthernet0/8
+ switchport trunk allowed vlan 30,35,110
+!
+interface FastEthernet0/9
+ switchport trunk allowed vlan 20,35,70,80,90,100,110
+!
+interface FastEthernet0/10
+ switchport trunk allowed vlan 10,35,70,90,100,110
+!
+interface FastEthernet0/11
+ switchport trunk allowed vlan 10,35,70,80,110
+!
+interface FastEthernet0/12
+ switchport trunk allowed vlan 50,80,90,110
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface FastEthernet0/13
+ switchport trunk allowed vlan 50,80,90,110
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface FastEthernet0/14
+ description LINK-TO-MAIN-EDGE-RTR
+ no switchport
+ ip address 10.10.255.5 255.255.255.252
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/15
+!
+interface FastEthernet0/16
+!
+interface FastEthernet0/17
+!
+interface FastEthernet0/18
+!
+interface FastEthernet0/19
+!
+interface FastEthernet0/20
+!
+interface FastEthernet0/21
+!
+interface FastEthernet0/22
+!
+interface FastEthernet0/23
+!
+interface FastEthernet0/24
+ switchport trunk allowed vlan 20,35,40,50,60,70,80,90,100,110
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface GigabitEthernet0/1
+ switchport trunk allowed vlan 20,35,40,70,80,90,100,110
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface GigabitEthernet0/2
+ switchport trunk allowed vlan 20,35,40,70,80,90,100,110
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan10
+ description ADMIN-GATEWAY
+ mac-address 0090.2b16.9802
+ ip address 10.10.7.3 255.255.255.128
+ ip helper-address 10.10.6.200
+ standby 10 ip 10.10.7.1
+ standby 10 preempt
+!
+interface Vlan20
+ mac-address 0090.2b16.9803
+ ip address 10.10.4.131 255.255.255.128
+ ip helper-address 10.10.6.200
+ standby 20 ip 10.10.4.129
+ standby 20 preempt
+!
+interface Vlan30
+ description RESEARCH-LABS-GATEWAY
+ mac-address 0090.2b16.9804
+ ip address 10.10.7.131 255.255.255.128
+ ip helper-address 10.10.6.200
+ ip access-group RESEARCH-POLICY in
+ standby 30 ip 10.10.7.129
+ standby 30 preempt
+!
+interface Vlan35
+ mac-address 0090.2b16.9805
+ ip address 10.10.6.3 255.255.255.192
+ ip helper-address 10.10.6.200
+ standby 35 ip 10.10.6.1
+ standby 35 preempt
+!
+interface Vlan40
+ mac-address 0090.2b16.9806
+ ip address 10.10.4.3 255.255.255.128
+ ip helper-address 10.10.6.200
+ ip access-group MAIN-STUDENT-ZERO-TRUST in
+ standby 40 ip 10.10.4.1
+ standby 40 preempt
+!
+interface Vlan50
+ description RESIDENCE-GATEWAY
+ mac-address 0090.2b16.9807
+ ip address 10.10.8.3 255.255.252.0
+ ip helper-address 10.10.6.200
+ ip access-group MAIN-STUDENT-ZERO-TRUST in
+ standby 50 ip 10.10.8.1
+ standby 50 preempt
+!
+interface Vlan60
+ description SERVER-GATEWAY
+ mac-address 0090.2b16.9808
+ ip address 10.10.6.195 255.255.255.192
+ ip access-group SERVER-ZERO-TRUST out
+ standby 60 ip 10.10.6.193
+ standby 60 preempt
+!
+interface Vlan70
+ mac-address 0090.2b16.9809
+ ip address 10.10.6.67 255.255.255.192
+ ip helper-address 10.10.6.200
+ standby 70 ip 10.10.6.65
+ standby 70 preempt
+!
+interface Vlan80
+ mac-address 0090.2b16.980a
+ ip address 10.10.5.131 255.255.255.128
+ ip helper-address 10.10.6.200
+ ip access-group MAIN-IOT-ZERO-TRUST in
+ standby 80 ip 10.10.5.129
+ standby 80 preempt
+!
+interface Vlan90
+ mac-address 0090.2b16.980b
+ ip address 10.10.5.3 255.255.255.128
+ ip helper-address 10.10.6.200
+ standby 90 ip 10.10.5.1
+ standby 90 preempt
+!
+interface Vlan100
+ mac-address 0090.2b16.980c
+ ip address 10.10.0.3 255.255.252.0
+ ip helper-address 10.10.6.200
+ ip access-group MAIN-STUDENT-ZERO-TRUST in
+ standby 100 ip 10.10.0.1
+ standby 100 preempt
+!
+interface Vlan110
+ mac-address 0090.2b16.980d
+ ip address 10.10.6.131 255.255.255.192
+ ip helper-address 10.10.6.200
+ standby 110 ip 10.10.6.129
+ standby 110 preempt
+!
+interface Vlan120
+ description ICT-ADMIN-GATEWAY
+ mac-address 0090.2b16.980e
+ ip address 10.10.12.3 255.255.255.224
+ ip helper-address 10.10.6.200
+ standby 120 ip 10.10.12.1
+ standby 120 preempt
+!
+ip classless
+ip route 0.0.0.0 0.0.0.0 10.10.255.6 
+!
+ip flow-export version 9
+!
+!
+ip access-list extended STUDENT-POLICY
+ remark ALLOW-STUDENT-PRINTER
+ permit ip any host 10.10.6.10
+ remark ALLOW-DNS-UDP
+ permit udp any host 10.10.6.200 eq domain
+ remark ALLOW-DNS-TCP
+ permit tcp any host 10.10.6.200 eq domain
+ remark BLOCK-SERVER-VLAN
+ deny ip any 10.10.6.192 0.0.0.63
+ remark BLOCK-STAFF-WIRED
+ deny ip any 10.10.4.128 0.0.0.127
+ remark BLOCK-STAFF-WIFI
+ deny ip any 10.10.5.0 0.0.0.127
+ remark BLOCK-IOT-SECURITY
+ deny ip any 10.10.5.128 0.0.0.127
+ remark BLOCK-OTHER-PRINTERS
+ deny ip any 10.10.6.0 0.0.0.63
+ remark BLOCK-VOICE
+ deny ip any 10.10.6.64 0.0.0.63
+ remark BLOCK-MANAGEMENT
+ deny ip any 10.10.6.128 0.0.0.63
+ remark ALLOW-OTHER-TRAFFIC
+ permit ip any any
+ip access-list extended RESEARCH-POLICY
+ remark ALLOW-DNS-UDP
+ permit udp any host 10.10.6.200 eq domain
+ remark ALLOW-DNS-TCP
+ permit tcp any host 10.10.6.200 eq domain
+ remark ALLOW-RESEARCH-PRINTING
+ permit ip any 10.10.6.0 0.0.0.63
+ remark BLOCK-ADMIN
+ deny ip any 10.10.7.0 0.0.0.127
+ remark BLOCK-STAFF-WIRED
+ deny ip any 10.10.4.128 0.0.0.127
+ remark BLOCK-STAFF-WIFI
+ deny ip any 10.10.5.0 0.0.0.127
+ remark BLOCK-IOT
+ deny ip any 10.10.5.128 0.0.0.127
+ remark BLOCK-SERVER-VLAN
+ deny ip any 10.10.6.192 0.0.0.63
+ remark BLOCK-VOICE
+ deny ip any 10.10.6.64 0.0.0.63
+ remark BLOCK-MANAGEMENT
+ deny ip any 10.10.6.128 0.0.0.63
+ remark ALLOW-OTHER-TRAFFIC
+ permit ip any any
+ip access-list extended RESIDENCE-POLICY
+ remark ALLOW-DNS-UDP
+ permit udp any host 10.10.6.200 eq domain
+ remark ALLOW-DNS-TCP
+ permit tcp any host 10.10.6.200 eq domain
+ remark BLOCK-ADMIN
+ deny ip any 10.10.7.0 0.0.0.127
+ remark BLOCK-RESEARCH-LABS
+ deny ip any 10.10.7.128 0.0.0.127
+ remark BLOCK-STAFF-WIRED
+ deny ip any 10.10.4.128 0.0.0.127
+ remark BLOCK-LIBRARY-USERS
+ deny ip any 10.10.4.0 0.0.0.127
+ remark BLOCK-STAFF-WIFI
+ deny ip any 10.10.5.0 0.0.0.127
+ remark BLOCK-IOT
+ deny ip any 10.10.5.128 0.0.0.127
+ remark BLOCK-PRINTERS
+ deny ip any 10.10.6.0 0.0.0.63
+ remark BLOCK-VOICE
+ deny ip any 10.10.6.64 0.0.0.63
+ remark BLOCK-MANAGEMENT
+ deny ip any 10.10.6.128 0.0.0.63
+ remark BLOCK-SERVER-VLAN
+ deny ip any 10.10.6.192 0.0.0.63
+ remark ALLOW-OTHER-TRAFFIC
+ permit ip any any
+ip access-list standard ICT-MANAGEMENT-ONLY
+ permit 10.10.12.0 0.0.0.31
+ permit host 10.10.6.204
+ deny any
+ip access-list extended SERVER-ZERO-TRUST
+ permit ip 10.10.12.0 0.0.0.31 10.10.6.192 0.0.0.63
+ permit udp any host 10.10.6.200 eq domain
+ permit tcp any host 10.10.6.200 eq domain
+ permit udp any host 10.10.6.200 eq bootps
+ permit udp 10.10.6.128 0.0.0.63 host 10.10.6.201 eq 1645
+ permit udp 10.10.6.128 0.0.0.63 host 10.10.6.201 eq 1812
+ permit ip 10.10.5.128 0.0.0.127 host 10.10.6.202
+ permit ip 10.20.80.0 0.0.0.255 host 10.10.6.202
+ permit udp any host 10.10.6.203 eq 514
+ permit udp any host 10.10.6.203 eq 123
+ permit ip host 10.10.6.153 host 10.10.6.204
+ permit udp host 10.10.5.10 host 10.10.6.201 eq 1645
+ permit udp host 10.10.5.10 host 10.10.6.201 eq 1812
+ remark ALLOW-SAT-WLC-RADIUS
+ permit udp host 10.20.90.10 host 10.10.6.201 eq 1645
+ permit udp host 10.20.90.10 host 10.10.6.201 eq 1812
+ deny ip any 10.10.6.192 0.0.0.63
+ permit ip any any
+ip access-list extended MAIN-STUDENT-ZERO-TRUST
+ permit udp any any eq bootps
+ permit udp any host 10.10.6.200 eq domain
+ permit tcp any host 10.10.6.200 eq domain
+ permit ip any 10.10.6.0 0.0.0.63
+ permit ip any host 10.10.5.10
+ deny ip any 10.10.0.0 0.0.255.255
+ deny ip any 10.20.0.0 0.0.255.255
+ permit ip any any
+ip access-list extended MAIN-IOT-ZERO-TRUST
+ permit udp any any eq bootps
+ permit udp any host 10.10.6.200 eq domain
+ permit tcp any host 10.10.6.200 eq domain
+ permit ip any host 10.10.6.202
+ permit udp any host 224.0.0.2 eq 1985
+ permit udp any host 224.0.0.102 eq 1985
+ deny ip any any
+!
+!
+!
+!
+!
+!
+logging 10.10.6.203
+line con 0
+!
+line aux 0
+!
+line vty 0 4
+ access-class ICT-MANAGEMENT-ONLY in
+ login local
+ transport input ssh
+line vty 5 15
+ access-class ICT-MANAGEMENT-ONLY in
+ login local
+ transport input ssh
+!
+!
+!
+ntp server 10.10.6.203
+!
+end

@@ -1,0 +1,169 @@
+version 15.0
+service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname LIB-SW2
+!
+enable secret 5 $1$mERr$D8mfJuBDqSS8Ta5b5FUFi1
+!
+!
+!
+mls qos
+!
+ip ssh version 2
+ip domain-name ul.local
+!
+username ictadmin secret 5 $1$mERr$eW5zsnm/DYW7MO2IPedta/
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+interface FastEthernet0/1
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security mac-address sticky 
+ switchport port-security violation restrict 
+ switchport port-security mac-address sticky 0090.0C1D.99A7
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet0/2
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security mac-address sticky 
+ switchport port-security violation restrict 
+ switchport port-security mac-address sticky 0007.EC13.0BA0
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet0/3
+ switchport access vlan 35
+ switchport mode access
+ switchport port-security
+ switchport port-security mac-address sticky 
+ switchport port-security violation restrict 
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet0/4
+ description LIBRARY-IP-PHONE
+ switchport access vlan 20
+ switchport mode access
+ switchport voice vlan 70
+ switchport port-security
+ switchport port-security maximum 3
+ switchport port-security violation restrict 
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ mls qos trust cos
+!
+interface FastEthernet0/5
+ description LIB-8021X-LAP1
+ switchport access vlan 90
+ switchport trunk native vlan 90
+ switchport trunk allowed vlan 90,100
+ switchport mode trunk
+ switchport port-security maximum 20
+ switchport port-security mac-address sticky 
+ switchport port-security violation restrict 
+ switchport port-security mac-address sticky 0001.97A7.10EA
+ switchport port-security mac-address sticky 0001.C9EA.2301
+ spanning-tree portfast trunk
+!
+interface FastEthernet0/6
+ description LIBRARY-IOT-ACCESS-POINT
+ switchport access vlan 80
+ switchport mode access
+ switchport port-security
+ switchport port-security maximum 10
+ switchport port-security mac-address sticky 
+ switchport port-security violation restrict 
+ switchport port-security mac-address sticky 0001.6457.185A
+ switchport port-security mac-address sticky 0006.2A08.C489
+ switchport port-security mac-address sticky 00E0.A35C.2551
+ switchport port-security mac-address sticky 00E0.F776.C2D2
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet0/7
+!
+interface FastEthernet0/8
+!
+interface FastEthernet0/9
+!
+interface FastEthernet0/10
+!
+interface FastEthernet0/11
+!
+interface FastEthernet0/12
+!
+interface FastEthernet0/13
+!
+interface FastEthernet0/14
+!
+interface FastEthernet0/15
+!
+interface FastEthernet0/16
+!
+interface FastEthernet0/17
+!
+interface FastEthernet0/18
+!
+interface FastEthernet0/19
+!
+interface FastEthernet0/20
+!
+interface FastEthernet0/21
+!
+interface FastEthernet0/22
+!
+interface FastEthernet0/23
+!
+interface FastEthernet0/24
+!
+interface GigabitEthernet0/1
+ switchport trunk allowed vlan 20,35,40,70,80,90,100,110
+ switchport mode trunk
+!
+interface GigabitEthernet0/2
+ switchport trunk allowed vlan 20,35,40,70,80,90,100,110
+ switchport mode trunk
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan110
+ description MANAGEMENT
+ ip address 10.10.6.141 255.255.255.192
+!
+ip default-gateway 10.10.6.129
+!
+logging 10.10.6.203
+!
+!
+!
+ip access-list standard ICT-MANAGEMENT-ONLY
+ permit 10.10.12.0 0.0.0.31
+ deny any
+line con 0
+!
+line vty 0 4
+ access-class ICT-MANAGEMENT-ONLY in
+ login
+ transport input ssh
+line vty 5 15
+ access-class ICT-MANAGEMENT-ONLY in
+ login
+ transport input ssh
+!
+!
+!
+ntp server 10.10.6.203
+!
+end

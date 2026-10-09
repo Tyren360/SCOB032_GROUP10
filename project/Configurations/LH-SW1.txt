@@ -1,0 +1,170 @@
+version 15.0
+service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname LH-SW1
+!
+enable secret 5 $1$mERr$D8mfJuBDqSS8Ta5b5FUFi1
+!
+!
+!
+ip ssh version 2
+ip domain-name ul.local
+!
+username ictadmin secret 5 $1$mERr$eW5zsnm/DYW7MO2IPedta/
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+interface FastEthernet0/1
+ description UNUSED-SECURED-PORT
+ switchport port-security maximum 50
+ shutdown
+!
+interface FastEthernet0/2
+ description LH-8021X-LAP1
+ switchport access vlan 90
+ switchport trunk native vlan 90
+ switchport trunk allowed vlan 90,100
+ switchport mode trunk
+ switchport port-security maximum 20
+ switchport port-security mac-address sticky 
+ switchport port-security violation restrict 
+ switchport port-security mac-address sticky 0001.64D7.7401
+ switchport port-security mac-address sticky 00D0.BC0C.4808
+ spanning-tree portfast trunk
+!
+interface FastEthernet0/3
+ description UNUSED-SECURED-PORT
+ shutdown
+!
+interface FastEthernet0/4
+ description UNUSED-SECURED-PORT
+ shutdown
+!
+interface FastEthernet0/5
+ description UNUSED-SHUTDOWN
+ shutdown
+!
+interface FastEthernet0/6
+ description UNUSED-SHUTDOWN
+ shutdown
+!
+interface FastEthernet0/7
+ description UNUSED-SHUTDOWN
+ shutdown
+!
+interface FastEthernet0/8
+ description UNUSED-SHUTDOWN
+ shutdown
+!
+interface FastEthernet0/9
+ description UNUSED-SHUTDOWN
+ shutdown
+!
+interface FastEthernet0/10
+ description UNUSED-SHUTDOWN
+ shutdown
+!
+interface FastEthernet0/11
+ description UNUSED-SHUTDOWN
+ shutdown
+!
+interface FastEthernet0/12
+ description UNUSED-SHUTDOWN
+ shutdown
+!
+interface FastEthernet0/13
+ description UNUSED-SHUTDOWN
+ shutdown
+!
+interface FastEthernet0/14
+ description UNUSED-SHUTDOWN
+ shutdown
+!
+interface FastEthernet0/15
+ description UNUSED-SHUTDOWN
+ shutdown
+!
+interface FastEthernet0/16
+ description UNUSED-SHUTDOWN
+ shutdown
+!
+interface FastEthernet0/17
+ description UNUSED-SHUTDOWN
+ shutdown
+!
+interface FastEthernet0/18
+ description UNUSED-SHUTDOWN
+ shutdown
+!
+interface FastEthernet0/19
+ description UNUSED-SHUTDOWN
+ shutdown
+!
+interface FastEthernet0/20
+ description UNUSED-SHUTDOWN
+ shutdown
+!
+interface FastEthernet0/21
+ description UNUSED-SHUTDOWN
+ shutdown
+!
+interface FastEthernet0/22
+ description UNUSED-SHUTDOWN
+ shutdown
+!
+interface FastEthernet0/23
+ description UNUSED-SHUTDOWN
+ shutdown
+!
+interface FastEthernet0/24
+ description UNUSED-SHUTDOWN
+ shutdown
+!
+interface GigabitEthernet0/1
+ description UPLINK-TO-CORE
+ switchport trunk allowed vlan 20,35,40,70,80,90,100,110
+ switchport mode trunk
+!
+interface GigabitEthernet0/2
+ description UPLINK-TO-CORE
+ switchport trunk allowed vlan 20,35,40,70,80,90,100,110
+ switchport mode trunk
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan110
+ description MANAGEMENT
+ ip address 10.10.6.142 255.255.255.192
+!
+ip default-gateway 10.10.6.129
+!
+logging 10.10.6.203
+!
+!
+!
+ip access-list standard ICT-MANAGEMENT-ONLY
+ permit 10.10.12.0 0.0.0.31
+ deny any
+line con 0
+!
+line vty 0 4
+ access-class ICT-MANAGEMENT-ONLY in
+ login
+ transport input ssh
+line vty 5 15
+ access-class ICT-MANAGEMENT-ONLY in
+ login
+ transport input ssh
+!
+!
+!
+ntp server 10.10.6.203
+!
+end

@@ -1,0 +1,111 @@
+version 15.1
+service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname SAT-VOICE-RTR
+!
+!
+!
+enable secret 5 <REDACTED>
+!
+!
+!
+!
+!
+!
+ip cef
+no ipv6 cef
+!
+!
+!
+username ictadmin privilege 15 secret 5 <REDACTED>
+!
+!
+license udi pid CISCO2811/K9 sn FTX101730T9-
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip ssh version 2
+no ip domain-lookup
+ip domain-name ul.local
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface FastEthernet0/0
+ description CONNECTION-TO-SAT-VOICE-VLAN
+ ip address 10.20.70.2 255.255.255.0
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/1
+ no ip address
+ duplex auto
+ speed auto
+ shutdown
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+ip classless
+ip route 0.0.0.0 0.0.0.0 10.20.70.1 
+!
+ip flow-export version 9
+!
+!
+ip access-list standard ICT-MANAGEMENT-ONLY
+ permit 10.10.12.0 0.0.0.31
+ deny any
+!
+!
+!
+!
+!
+logging 10.10.6.203
+dial-peer voice 200 voip
+ destination-pattern 2...
+ session target ipv4:10.10.6.68
+!
+telephony-service
+ max-ephones 10
+ max-dn 10
+ ip source-address 10.20.70.2 port 2000
+ auto assign 1 to 10
+!
+ephone-dn 1
+ number 3001
+!
+ephone 1
+ device-security-mode none
+ mac-address 0002.4AA3.A086
+ type 7960
+ button 1:1
+!
+line con 0
+!
+line aux 0
+!
+line vty 0 4
+ access-class ICT-MANAGEMENT-ONLY in
+ login local
+ transport input ssh
+!
+!
+ntp server 10.10.6.203
+!
+end

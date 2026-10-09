@@ -1,0 +1,187 @@
+version 15.1
+service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname MAIN-VOICE-RTR
+!
+!
+!
+enable secret 5 <REDACTED>
+!
+!
+ip dhcp excluded-address 10.10.6.65 10.10.6.75
+!
+ip dhcp pool VOICE-VLAN
+ network 10.10.6.64 255.255.255.192
+ default-router 10.10.6.65
+ option 150 ip 10.10.6.68
+!
+!
+!
+ip cef
+no ipv6 cef
+!
+!
+!
+username ictadmin privilege 15 secret 5 <REDACTED>
+!
+!
+license udi pid CISCO2811/K9 sn FTX10170AGM-
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip ssh version 2
+ip domain-name ul.local
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface FastEthernet0/0
+ description CONNECTION-TO-VOICE-VLAN
+ ip address 10.10.6.68 255.255.255.192
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/1
+ no ip address
+ duplex auto
+ speed auto
+ shutdown
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+ip classless
+ip route 0.0.0.0 0.0.0.0 10.10.6.65 
+!
+ip flow-export version 9
+!
+!
+ip access-list standard ICT-MANAGEMENT-ONLY
+ permit 10.10.12.0 0.0.0.31
+ deny any
+!
+!
+!
+!
+!
+logging 10.10.6.203
+dial-peer voice 300 voip
+ destination-pattern 3...
+ session target ipv4:10.20.70.2
+!
+telephony-service
+ max-ephones 20
+ max-dn 20
+ ip source-address 10.10.6.68 port 2000
+ auto assign 1 to 20
+!
+ephone-dn 1
+ number 2001
+!
+ephone-dn 2
+ number 2002
+!
+ephone-dn 3
+ number 2003
+!
+ephone-dn 4
+ number 2004
+!
+ephone-dn 5
+ number 2005
+!
+ephone-dn 6
+ number 2006
+!
+ephone-dn 7
+ number 2007
+!
+ephone-dn 8
+ number 2008
+!
+ephone-dn 9
+ number 2009
+!
+ephone 1
+ device-security-mode none
+ mac-address 00E0.F740.D2D2
+ type 7960
+ button 1:1
+!
+ephone 2
+ device-security-mode none
+ mac-address 0060.2F20.7935
+ type 7960
+ button 1:5
+!
+ephone 3
+ device-security-mode none
+ mac-address 0001.96BA.D57C
+ type 7960
+ button 1:4
+!
+ephone 4
+ device-security-mode none
+ mac-address 00D0.D3AC.6BD8
+ type 7960
+ button 1:2
+!
+ephone 5
+ device-security-mode none
+ mac-address 000A.F399.1A92
+ type 7960
+ button 1:6
+!
+ephone 6
+ device-security-mode none
+ mac-address 0001.9603.3D66
+ type 7960
+ button 1:3
+!
+ephone 7
+ device-security-mode none
+ mac-address 000B.BE84.C88A
+ type 7960
+ button 1:9
+!
+ephone 8
+ device-security-mode none
+ mac-address 0001.C987.A416
+ type 7960
+ button 1:7
+!
+ephone 9
+ device-security-mode none
+ mac-address 0030.A30C.C04A
+ type 7960
+ button 1:8
+!
+line con 0
+!
+line aux 0
+!
+line vty 0 4
+ access-class ICT-MANAGEMENT-ONLY in
+ login local
+ transport input ssh
+!
+!
+ntp server 10.10.6.203
+!
+end
